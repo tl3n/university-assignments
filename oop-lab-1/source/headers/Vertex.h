@@ -1,15 +1,20 @@
 #ifndef LAB1_VERTEX_H
 #define LAB1_VERTEX_H
 
-template <typename VertexT>
-class Vertex
+class VertexBase
 {
 public:
-    Vertexdata(VertexT vertexdData{})
+    static inline int numberOfVertices{ 1 };
+};
+
+template <typename VertexT>
+class Vertex : VertexBase
+{
+public:
+    Vertex(VertexT vertexData)
     {
-        m_number = numberOfVertices;
+        m_number = numberOfVertices++;
         m_data = vertexData;
-        ++numberOfVertices;
     }
 
     VertexT getData() { return m_data; }
@@ -21,9 +26,9 @@ public:
     void setNumber(int vertexNumber) { m_number = vertexNumber; }
 
 private:
-    static int numberOfVertices{};
     int m_number{};
     VertexT m_data{};
 };
 
-#endif LAB1_VERTEX_H
+
+#endif
