@@ -30,5 +30,4 @@ private:
     VertexT m_data{};
 };
 
-
 #endif
