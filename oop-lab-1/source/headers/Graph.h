@@ -2,30 +2,28 @@
 #define LAB1_GRAPH_H
 
 #include <iostream>
+#include <initializer_list>
+#include <map>
 
-template <typename vertexT, typename edgeT>
+template <typename VertexT, typename EdgeT>
 class Graph
 {
 public:
-    Graph(int numberOfVertices = 1)
+    Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
     {
-        if (numberOfVertices < 1)
+        for (const auto& pair : vertices)
         {
-            std::cout << "CANNOT CREATE SUCH A GRAPH\n";
-        }
-        else
-        {
-            m_numberOfVertices = numberOfVertices;
+            m_vertices[pair.first] = pair.second;
         }
     }
     // Додавання вершини
-    virtual void addVertex(int vertexNumber, vertexT vertexData) = 0;
+    virtual void addVertex(int vertexNumber, VertexT vertexData) = 0;
 
     // Вилучення вершини
     virtual void deleteVertex(int vertexNumber) = 0; // #TODO: При видаленні деякої вершини, також видаляти всі пов'язані з нею ребра.
 
     // Додавання ребра
-    virtual void addEdge(int firstVertexNumber, int secondVertexNumber, edgeT edgeData) = 0;
+    virtual void addEdge(int firstVertexNumber, int secondVertexNumber, EdgeT edgeData) = 0;
 
     // Вилучення ребра
     virtual void deleteEdge(int firstVertexNumber, int secondVertexNumber) = 0;
@@ -35,9 +33,8 @@ public:
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
-
 protected:
-    int m_numberOfVertices{};
+    std::map<int, VertexT> m_vertices;
 };   
 
 #endif
