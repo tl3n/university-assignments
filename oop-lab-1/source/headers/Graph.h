@@ -9,7 +9,7 @@ template <typename VertexT, typename EdgeT>
 class Graph
 {
 public:
-    Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
+    explicit Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
     {
         for (const auto& pair : vertices)
         {
