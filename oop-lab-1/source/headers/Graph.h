@@ -1,3 +1,6 @@
+#ifndef LAB1_GRAPH_H
+#define LAB1_GRAPH_H
+
 #include <iostream>
 
 template <typename vertexT, typename edgeT>
@@ -36,3 +39,5 @@ public:
 protected:
     int m_numberOfVertices{};
 };   
+
+#endif
