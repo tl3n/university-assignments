@@ -11,7 +11,7 @@ template <typename VertexT>
 class Vertex : VertexBase
 {
 public:
-    Vertex(VertexT vertexData)
+    explicit Vertex(VertexT vertexData)
     {
         m_number = numberOfVertices++;
         m_data = vertexData;
