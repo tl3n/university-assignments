@@ -37,7 +37,7 @@ public:
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
 
     // DFS обхід графа
-    virutal void DepthFirstSearch(int vertexNumber, std::vector<bool>& visited) = 0;
+    virtual void DepthFirstSearch(int vertexNumber, std::vector<bool>& visited) = 0;
 protected:
     std::map<int, VertexT> m_vertices;
 };   
