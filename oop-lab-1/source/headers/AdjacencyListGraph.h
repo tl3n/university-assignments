@@ -83,17 +83,6 @@ public:
 
     void printGraph()
     {
-        /*for (auto& x : m_adjacencyList)
-        {
-            std::cout << m_vertices << ": ";
-            auto edges = x.second;
-            for (auto& y : edges)
-            {
-                std::cout << y.first << '.' << y.second << ", ";
-            }
-            std::cout << '\n';
-        }*/
-
         for (auto& vertex: m_vertices)
         {
             std::cout << vertex.first << ": ";
