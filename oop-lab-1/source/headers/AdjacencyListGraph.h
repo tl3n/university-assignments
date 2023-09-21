@@ -40,8 +40,12 @@ public:
 
     void deleteEdge(int firstVertexNumber, int secondVertexNumber) override
     {
-
-    }
+        if (m_vertices.find(firstVertexNumber) != m_vertices.end() && m_vertices.find(secondVertexNumber) != m_vertices.end())
+        {
+            auto& edges = m_adjacencyList[firstVertexNumber];
+            edges.erase(edges.begin() + secondVertexNumber - 1);
+        }
+    }   
 
     bool isConnected() override
     {
