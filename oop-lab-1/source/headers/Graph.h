@@ -35,7 +35,7 @@ public:
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
-private:
+protected:
     std::map<int, VertexT> m_vertices;
 };   
 
