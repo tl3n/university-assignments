@@ -12,7 +12,14 @@ public:
 
     void addVertex(int vertexNumber, VertexT vertexData) override
     {
-        m_vertices[vertexNumber] = vertexData;
+        if (vertices.find(vertexNumber) == vertices.end())
+        {
+            m_vertices[vertexNumber] = vertexData;
+        }
+        else
+        {
+            std::cout << "THERE IS ALREADY A VERTEX WITH SUCH NUMBER\n";
+        }
     }
 
     void deleteVertex(int vertexNumber) override
@@ -27,6 +34,10 @@ public:
                 auto& edges = vertex.second;
                 edges.erase(std::remove_if(edges.begin(), edges.end(), [vertexNumber](auto& edge) { return edge.first == vertexNumber; }), edges.end());
             }
+        }
+        else
+        {
+            std::cout << "THERE IS NO VERTEX WITH SUCH A NUMBER\n";
         }
     }
 
