@@ -2,8 +2,10 @@
 #define LAB1_GRAPH_H
 
 #include <iostream>
+#include <vector>
 #include <initializer_list>
 #include <map>
+#include <algorithm>
 
 template <typename VertexT, typename EdgeT>
 class Graph
@@ -20,7 +22,7 @@ public:
     virtual void addVertex(int vertexNumber, VertexT vertexData) = 0;
 
     // Вилучення вершини
-    virtual void deleteVertex(int vertexNumber) = 0; // #TODO: При видаленні деякої вершини, також видаляти всі пов'язані з нею ребра.
+    virtual void deleteVertex(int vertexNumber) = 0;
 
     // Додавання ребра
     virtual void addEdge(int firstVertexNumber, int secondVertexNumber, EdgeT edgeData) = 0;
@@ -33,7 +35,7 @@ public:
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
-protected:
+private:
     std::map<int, VertexT> m_vertices;
 };   
 
