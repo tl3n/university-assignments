@@ -7,12 +7,17 @@ template <typename VertexT, typename EdgeT>
 class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 {
 public:
-    AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)    
-    {}
+    AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
+    {
+        for (const auto& pair : vertices)
+        {
+            m_vertices[pair.first] = pair.second;
+        }
+    }
 
     void addVertex(int vertexNumber, VertexT vertexData) override
     {
-        if (vertices.find(vertexNumber) == vertices.end())
+        if (m_vertices.find(vertexNumber) == m_vertices.end())
         {
             m_vertices[vertexNumber] = vertexData;
         }
@@ -78,15 +83,38 @@ public:
 
     void printGraph()
     {
-        for (auto& x : m_adjacencyList)
+        /*for (auto& x : m_adjacencyList)
         {
-            std::cout << x.first << ": ";
+            std::cout << m_vertices << ": ";
             auto edges = x.second;
             for (auto& y : edges)
             {
                 std::cout << y.first << '.' << y.second << ", ";
             }
             std::cout << '\n';
+        }*/
+
+        for (auto& vertex: m_vertices)
+        {
+            std::cout << vertex.first << ": ";
+            for (auto& adjacent : m_adjacencyList[vertex.first])
+            {
+                std::cout << adjacent.first << ' ';
+            }
+            std::cout << '\n';
+        }
+    }
+
+    void DepthFirstSearch(int vertexNumber, std::vector<bool>& visited) override
+    {
+        visited[vertexNumber] = true;
+
+        for (auto& adjacent: m_adjacencyList[vertexNumber])
+        {
+            if (!visited[adjacent.first])
+            {
+                DepthFirstSearch(adjacent.first, visited);
+            }
         }
     }
 private:
