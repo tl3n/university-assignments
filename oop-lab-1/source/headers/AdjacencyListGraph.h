@@ -36,6 +36,10 @@ public:
        {
             m_adjacencyList[firstVertexNumber].emplace_back(secondVertexNumber, edgeData);
        }
+       else
+       {
+            std::cout << "CAN NOT ADD SUCH AN EDGE\n";
+       }
     }
 
     void deleteEdge(int firstVertexNumber, int secondVertexNumber) override
@@ -44,6 +48,10 @@ public:
         {
             auto& edges = m_adjacencyList[firstVertexNumber];
             edges.erase(edges.begin() + secondVertexNumber - 1);
+        }
+        else
+        {
+            std::cout << "CAN NOT FIND SUCH AN EDGE\n";
         }
     }   
 
