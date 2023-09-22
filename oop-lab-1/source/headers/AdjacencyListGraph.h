@@ -78,7 +78,33 @@ public:
 
     int findDistance(int firstVertexNumber, int secondVertexNumber) override
     {
-        return 0;
+        // BFS
+        std::vector<int> distance(m_vertices.size(), 0);
+
+        std::vector<bool> visited(m_vertices.size(), false);
+        visited[firstVertexNumber] = true;
+
+        std::queue<int> queue;
+        queue.push(firstVertexNumber);
+
+        while (!queue.empty())
+        {
+            firstVertexNumber = queue.front();
+            queue.pop();
+
+            for (auto& adjacent: m_adjacencyList[firstVertexNumber])
+            {
+                if (!visited[adjacent.first])
+                {
+                    visited[adjacent.first] = true;
+                    queue.push(adjacent.first);
+
+                    distance[adjacent.first] = distance[firstVertexNumber] + 1;
+                }
+            }
+        }
+
+        return distance[secondVertexNumber];
     }
 
     void printGraph()
@@ -103,30 +129,6 @@ public:
             if (!visited[adjacent.first])
             {
                 DepthFirstSearch(adjacent.first, visited);
-            }
-        }
-    }
-
-    void BreadthFirstSearch(int vertexNumber)
-    {
-        std::vector<bool> visited(m_vertices.size(), false);
-        visited[vertexNumber] = true;
-
-        std::queue<int> queue;
-        queue.push(vertexNumber);
-
-        while (!queue.empty())
-        {
-            vertexNumber = queue.front();
-            queue.pop();
-
-            for (auto& adjacent: m_adjacencyList[vertexNumber])
-            {
-                if (!visited[adjacent.first])
-                {
-                    visited[adjacent.first] = true;
-                    queue.push(adjacent.first);
-                }
             }
         }
     }
