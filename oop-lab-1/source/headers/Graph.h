@@ -31,8 +31,11 @@ public:
     // Вилучення ребра
     virtual void deleteEdge(int firstVertexNumber, int secondVertexNumber) = 0;
 
-    // Перевірка на зв'язність
-    virtual bool isConnected() = 0;
+    // Перевірка на слабку зв'язність
+    virtual bool isWeaklyConnected() = 0;
+
+    // Перевірка на сильну зв'язність
+    virutal bool isStronglyConnected() = 0;
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;

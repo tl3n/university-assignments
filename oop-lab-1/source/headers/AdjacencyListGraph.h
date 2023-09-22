@@ -71,8 +71,27 @@ public:
         }
     }   
 
-    bool isConnected() override
+    bool isWeaklyConnected() override
     {
+        return true;
+    }
+
+    bool isStronglyConnected() override
+    {
+        for (auto& vertex : m_vertices)
+        {
+            std::vector visited(m_vertices.size(), false);
+            DepthFirstSearch(vertex.first, visited);
+
+            for (int i = 0; i < visited.size(); ++i)
+            {
+                if (!visited[i])
+                {
+                    return false;
+                }
+            }
+        }
+        
         return true;
     }
 
