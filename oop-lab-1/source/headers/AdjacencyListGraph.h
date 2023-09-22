@@ -106,6 +106,30 @@ public:
             }
         }
     }
+
+    void BreadthFirstSearch(int vertexNumber)
+    {
+        std::vector<bool> visited(m_vertices.size(), false);
+        visited[vertexNumber] = true;
+
+        std::queue<int> queue;
+        queue.push(vertexNumber);
+
+        while (!queue.empty())
+        {
+            vertexNumber = queue.front();
+            queue.pop();
+
+            for (auto& adjacent: m_adjacencyList[vertexNumber])
+            {
+                if (!visited[adjacent.first])
+                {
+                    visited[adjacent.first] = true;
+                    queue.push(adjacent.first);
+                }
+            }
+        }
+    }
 private:
     std::map<int, VertexT> m_vertices;
     std::map<int, std::vector<std::pair<int, EdgeT>>> m_adjacencyList;
