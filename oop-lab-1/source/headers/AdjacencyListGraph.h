@@ -9,9 +9,9 @@ class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 public:
     AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
     {
-        for (const auto& pair : vertices)
+        for (const auto& vertex : vertices)
         {
-            m_vertices[pair.first] = pair.second;
+            m_vertices[vertex.first] = vertex.second;
         }
     }
 
@@ -150,6 +150,26 @@ public:
                 DepthFirstSearch(adjacent.first, visited);
             }
         }
+    }
+
+    AdjacencyListGraph<VertexT, EdgeT>* getTrasposed()
+    {
+        AdjacencyListGraph transposed = new AdjacencyListGraph();
+        
+        for (auto& vertex : m_vertices)
+        {
+            transposed.m_vertices[vertex.first] = vertex.second;
+
+            for (auto& adjacent : m_adjacencyList[vertex.first])
+            {
+                for (auto& edge : adjacent)
+                {
+                    transposed.m_adjacencyList[edge.first].vertex.first = edge.second;
+                }
+            }
+        }
+
+        return transposed;
     }
 private:
     std::map<int, VertexT> m_vertices;

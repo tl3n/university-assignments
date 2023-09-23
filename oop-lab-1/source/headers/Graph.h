@@ -35,7 +35,7 @@ public:
     virtual bool isWeaklyConnected() = 0;
 
     // Перевірка на сильну зв'язність
-    virutal bool isStronglyConnected() = 0;
+    virtual bool isStronglyConnected() = 0;
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
