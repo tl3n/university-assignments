@@ -7,7 +7,7 @@ template <typename VertexT, typename EdgeT>
 class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 {
 public:
-    AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
+    explicit AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
     {
         for (const auto& vertex : vertices)
         {
@@ -73,6 +73,31 @@ public:
 
     bool isWeaklyConnected() override
     {
+        std::vector<bool> visited(m_vertices.size(), false);
+        typename std::map<int, VertexT>::iterator it = m_vertices.begin(); 
+        DepthFirstSearch(it->first, visited);
+
+        for (int i = 0; i < visited.size(); ++i)
+        {
+            if (!visited[i])
+            {
+                return false;
+            }
+        }
+
+        AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
+        it = transposed->m_vertices.begin();
+        visited.resize(m_vertices.size(), false);
+        transposed->DepthFirstSearch(it->first, visited);
+
+        for (int i = 0; i < visited.size(); ++i)
+        {
+            if (!visited[i])
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -152,23 +177,22 @@ public:
         }
     }
 
-    AdjacencyListGraph<VertexT, EdgeT>* getTrasposed()
+    AdjacencyListGraph<VertexT, EdgeT>* getTransposed()
     {
-        AdjacencyListGraph transposed = new AdjacencyListGraph();
-        
+        AdjacencyListGraph* transposed = new AdjacencyListGraph{};
         for (auto& vertex : m_vertices)
         {
-            transposed.m_vertices[vertex.first] = vertex.second;
-
-            for (auto& adjacent : m_adjacencyList[vertex.first])
-            {
-                for (auto& edge : adjacent)
-                {
-                    transposed.m_adjacencyList[edge.first].vertex.first = edge.second;
-                }
-            }
+            transposed->m_vertices[vertex.first] = vertex.second; 
         }
 
+        for (auto& adjacent: m_adjacencyList)
+        {
+            for (auto& edge : adjacent.second)
+            {
+                transposed->m_adjacencyList[edge.first].emplace_back(adjacent.first, edge.second);
+            }
+        }
+    
         return transposed;
     }
 private:
