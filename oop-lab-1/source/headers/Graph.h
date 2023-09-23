@@ -12,6 +12,9 @@ template <typename VertexT, typename EdgeT>
 class Graph
 {
 public:
+    explicit Graph()
+    {
+    }
     explicit Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
     {
         for (const auto& pair : vertices)

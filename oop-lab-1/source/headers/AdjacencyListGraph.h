@@ -7,6 +7,10 @@ template <typename VertexT, typename EdgeT>
 class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 {
 public:
+    explicit AdjacencyListGraph() : Graph<VertexT, EdgeT>()
+    {
+    }
+
     explicit AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
     {
         for (const auto& vertex : vertices)
@@ -195,6 +199,16 @@ public:
     
         return transposed;
     }
+
+    std::map<int, VertexT>& getVertices()
+    { 
+        return m_vertices; 
+    }
+    std::map<int, std::vector<std::pair<int, EdgeT>>>& getAdjacencyList()
+    { 
+        return m_adjacencyList;
+    }
+
 private:
     std::map<int, VertexT> m_vertices;
     std::map<int, std::vector<std::pair<int, EdgeT>>> m_adjacencyList;
