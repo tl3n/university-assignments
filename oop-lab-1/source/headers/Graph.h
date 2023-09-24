@@ -17,11 +17,10 @@ public:
     }
     explicit Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
     {
-        for (const auto& pair : vertices)
-        {
-            m_vertices[pair.first] = pair.second;
-        }
     }
+
+    virtual ~Graph() = default;
+
     // Додавання вершини
     virtual void addVertex(int vertexNumber, VertexT vertexData) = 0;
 
@@ -44,9 +43,7 @@ public:
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
 
     // DFS обхід графа
-    virtual void DepthFirstSearch(int vertexNumber, std::vector<bool>& visited) = 0;
-protected:
-    std::map<int, VertexT> m_vertices;
+    virtual void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) = 0;
 };   
 
 #endif
