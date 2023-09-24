@@ -136,7 +136,7 @@ TEST_CASE("testing findDistance()")
     graph.addEdge(3, 4, 3);
     graph.addEdge(4, 5, 4);
 
-    REQUIRE(graph.findDistance(1, 5) == 2);
+    REQUIRE(graph.findDistance(1, 2) == 1);
     REQUIRE(graph.findDistance(1, 4) == 3);
     REQUIRE(graph.findDistance(4, 3) == 0);
 }

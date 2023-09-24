@@ -132,39 +132,28 @@ public:
 
         while (!queue.empty())
         {
-            firstVertexNumber = queue.front();
+            int currentVertex = queue.front();
             queue.pop();
 
-            for (auto& adjacent: m_adjacencyList[firstVertexNumber])
+            for (auto& edge: m_adjacencyList[currentVertex])
             {
-                bool found = false;
-                for (auto& vertex : visited)
+                int adjacent = edge.first;
+                if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
                 {
-                    if (vertex == adjacent.first)
-                    {
-                        found = true;
-                    }
+                    visited.push_back(adjacent);
+                    queue.push(adjacent);
+
+                    distance[adjacent] = distance[currentVertex] + 1;
                 }
-
-                if (!found)
-                {
-                    visited.push_back(adjacent.first);
-                    queue.push(adjacent.first);
-
-                    distance[firstVertexNumber] = distance[firstVertexNumber] + 1;
-                }
-
-                /*if (!visited[adjacent.first])
-                {
-                    visited[adjacent.first] = true;
-                    queue.push(adjacent.first);
-
-                    distance[adjacent.first] = distance[firstVertexNumber] + 1;
-                }*/
             }
         }
 
-        return distance[secondVertexNumber];
+        if (distance.find(secondVertexNumber) != distance.end())
+        {
+            return distance[secondVertexNumber];
+        }
+
+        return 0;
     }
 
     void printGraph()
@@ -184,20 +173,12 @@ public:
     {
         visited.emplace_back(vertexNumber);
 
-        for (auto& adjacent: m_adjacencyList[vertexNumber])
-        {   
-            bool found = false;
-            for (auto& vertex : visited)
+        for (auto& edge: m_adjacencyList[vertexNumber])
+        {
+            int adjacent = edge.first;
+            if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
             {
-                if (vertex == adjacent.first)
-                {
-                    found = true;
-                }
-            }
-
-            if (!found)
-            {
-                DepthFirstSearch(adjacent.first, visited);
+                DepthFirstSearch(adjacent, visited);
             }
         }
     }
@@ -206,15 +187,22 @@ public:
     {
         AdjacencyListGraph* transposed = new AdjacencyListGraph{};
         for (auto& vertex : m_vertices)
-        {
-            transposed->m_vertices[vertex.first] = vertex.second; 
+        {   
+            int vertexNumber = vertex.first;
+            VertexT vertexData = vertex.second;
+
+            transposed->addVertex(vertexNumber, vertexData);
         }
 
-        for (auto& adjacent: m_adjacencyList)
+        for (auto& edges: m_adjacencyList)
         {
-            for (auto& edge : adjacent.second)
+            int adjacent = edges.first;
+            for (auto& edge : edges.second)
             {
-                transposed->m_adjacencyList[edge.first].emplace_back(adjacent.first, edge.second);
+                int vertexNumber = edge.first;
+                EdgeT edgeData = edge.second;
+                
+                transposed->addEdge(vertexNumber, adjacent, edgeData);
             }
         }
     
