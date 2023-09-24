@@ -77,11 +77,11 @@ public:
 
     bool isWeaklyConnected() override
     {
-        std::vector<bool> visited(m_vertices.size(), false);
+        std::vector<bool> visited(m_vertices.size() + 1, false);
         typename std::map<int, VertexT>::iterator it = m_vertices.begin(); 
         DepthFirstSearch(it->first, visited);
 
-        for (int i = 0; i < visited.size(); ++i)
+        for (int i = 1; i < visited.size(); ++i)
         {
             if (!visited[i])
             {
@@ -91,10 +91,10 @@ public:
 
         AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
         it = transposed->m_vertices.begin();
-        visited.resize(m_vertices.size(), false);
+        visited.resize(m_vertices.size() + 1, false);
         transposed->DepthFirstSearch(it->first, visited);
 
-        for (int i = 0; i < visited.size(); ++i)
+        for (int i = 1; i < visited.size(); ++i)
         {
             if (!visited[i])
             {
@@ -109,10 +109,10 @@ public:
     {
         for (auto& vertex : m_vertices)
         {
-            std::vector visited(m_vertices.size(), false);
+            std::vector visited(m_vertices.size() + 1, false);
             DepthFirstSearch(vertex.first, visited);
 
-            for (int i = 0; i < visited.size(); ++i)
+            for (int i = 1; i < visited.size(); ++i)
             {
                 if (!visited[i])
                 {
