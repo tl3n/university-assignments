@@ -19,15 +19,17 @@ public:
         }
     }
 
+    ~AdjacencyListGraph() = default;
+
     void addVertex(int vertexNumber, VertexT vertexData) override
     {
-        if (m_vertices.find(vertexNumber) == m_vertices.end())
+        if (m_vertices.find(vertexNumber) == m_vertices.end() && vertexNumber >= 0)
         {
             m_vertices[vertexNumber] = vertexData;
         }
         else
         {
-            std::cout << "THERE IS ALREADY A VERTEX WITH SUCH NUMBER\n";
+            std::cout << "CAN NOT ADD THIS VERTEX\n";
         }
     }
 
@@ -75,62 +77,55 @@ public:
         }
     }   
 
-    bool isWeaklyConnected() override
+    bool isConnected()
     {
-        std::vector<bool> visited(m_vertices.size() + 1, false);
-        typename std::map<int, VertexT>::iterator it = m_vertices.begin(); 
-        DepthFirstSearch(it->first, visited);
+        typename std::map<int, VertexT>::iterator it = m_vertices.begin();
 
-        for (int i = 1; i < visited.size(); ++i)
+        if (it != m_vertices.end())
         {
-            if (!visited[i])
-            {
-                return false;
-            }
-        }
+            std::vector<int> visited;
+            DepthFirstSearch(it->first, visited);
 
-        AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
-        it = transposed->m_vertices.begin();
-        visited.resize(m_vertices.size() + 1, false);
-        transposed->DepthFirstSearch(it->first, visited);
-
-        for (int i = 1; i < visited.size(); ++i)
-        {
-            if (!visited[i])
+            if (visited.size() != m_vertices.size())
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    bool isWeaklyConnected() override
+    {
+        AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
+        
+        return isConnected() || transposed->isConnected();
     }
 
     bool isStronglyConnected() override
     {
         for (auto& vertex : m_vertices)
         {
-            std::vector visited(m_vertices.size() + 1, false);
+            std::vector<int> visited;
             DepthFirstSearch(vertex.first, visited);
 
-            for (int i = 1; i < visited.size(); ++i)
+            if (visited.size() != m_vertices.size())
             {
-                if (!visited[i])
-                {
-                    return false;
-                }
+                return false;
             }
         }
-        
+
         return true;
     }
 
     int findDistance(int firstVertexNumber, int secondVertexNumber) override
     {
         // BFS
-        std::vector<int> distance(m_vertices.size(), 0);
+        std::map<int, int> distance;
+        distance[firstVertexNumber] = 0;
 
-        std::vector<bool> visited(m_vertices.size(), false);
-        visited[firstVertexNumber] = true;
+        std::vector<int> visited;
+        visited.push_back(firstVertexNumber);
 
         std::queue<int> queue;
         queue.push(firstVertexNumber);
@@ -142,13 +137,30 @@ public:
 
             for (auto& adjacent: m_adjacencyList[firstVertexNumber])
             {
-                if (!visited[adjacent.first])
+                bool found = false;
+                for (auto& vertex : visited)
+                {
+                    if (vertex == adjacent.first)
+                    {
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                {
+                    visited.push_back(adjacent.first);
+                    queue.push(adjacent.first);
+
+                    distance[firstVertexNumber] = distance[firstVertexNumber] + 1;
+                }
+
+                /*if (!visited[adjacent.first])
                 {
                     visited[adjacent.first] = true;
                     queue.push(adjacent.first);
 
                     distance[adjacent.first] = distance[firstVertexNumber] + 1;
-                }
+                }*/
             }
         }
 
@@ -168,13 +180,22 @@ public:
         }
     }
 
-    void DepthFirstSearch(int vertexNumber, std::vector<bool>& visited) override
+    void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) override
     {
-        visited[vertexNumber] = true;
+        visited.emplace_back(vertexNumber);
 
         for (auto& adjacent: m_adjacencyList[vertexNumber])
-        {
-            if (!visited[adjacent.first])
+        {   
+            bool found = false;
+            for (auto& vertex : visited)
+            {
+                if (vertex == adjacent.first)
+                {
+                    found = true;
+                }
+            }
+
+            if (!found)
             {
                 DepthFirstSearch(adjacent.first, visited);
             }
