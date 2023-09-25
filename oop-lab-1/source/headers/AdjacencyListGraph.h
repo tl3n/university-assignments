@@ -202,11 +202,6 @@ public:
     
         return transposed;
     }
-
-    std::map<int, VertexT>& getVertices()
-    { 
-        return this->m_vertices; 
-    }
     
     std::map<int, std::list<std::pair<int, EdgeT>>> getAdjacencyList()
     {

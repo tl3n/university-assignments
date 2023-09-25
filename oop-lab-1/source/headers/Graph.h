@@ -50,6 +50,11 @@ public:
     // DFS обхід графа
     virtual void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) = 0;
 
+    virtual std::map<int, VertexT>& getVertices()
+    { 
+        return this->m_vertices; 
+    }
+
 protected:
     std::map<int, VertexT> m_vertices;
 };   
