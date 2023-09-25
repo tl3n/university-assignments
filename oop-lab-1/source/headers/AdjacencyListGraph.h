@@ -7,25 +7,17 @@ template <typename VertexT, typename EdgeT>
 class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 {
 public:
-    explicit AdjacencyListGraph() : Graph<VertexT, EdgeT>()
-    {
-    }
+    explicit AdjacencyListGraph() : Graph<VertexT, EdgeT>() {}
 
-    explicit AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices)
-    {
-        for (const auto& vertex : vertices)
-        {
-            m_vertices[vertex.first] = vertex.second;
-        }
-    }
+    explicit AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices) {}
 
     ~AdjacencyListGraph() = default;
 
     void addVertex(int vertexNumber, VertexT vertexData) override
     {
-        if (m_vertices.find(vertexNumber) == m_vertices.end() && vertexNumber >= 0)
+        if (this->m_vertices.find(vertexNumber) == this->m_vertices.end() && vertexNumber >= 0)
         {
-            m_vertices[vertexNumber] = vertexData;
+            this->m_vertices[vertexNumber] = vertexData;
         }
         else
         {
@@ -35,9 +27,9 @@ public:
 
     void deleteVertex(int vertexNumber) override
     {
-        if (m_vertices.find(vertexNumber) != m_vertices.end())
+        if (this->m_vertices.find(vertexNumber) != this->m_vertices.end())
         {
-            m_vertices.erase(vertexNumber);
+            this->m_vertices.erase(vertexNumber);
             m_adjacencyList.erase(vertexNumber);
 
             for (auto& vertex : m_adjacencyList)
@@ -54,7 +46,7 @@ public:
 
     void addEdge(int firstVertexNumber, int secondVertexNumber, EdgeT edgeData) override
     {
-       if (m_vertices.find(firstVertexNumber) != m_vertices.end() && m_vertices.find(secondVertexNumber) != m_vertices.end())
+       if (this->m_vertices.find(firstVertexNumber) != this->m_vertices.end() && this->m_vertices.find(secondVertexNumber) != this->m_vertices.end())
        {
             m_adjacencyList[firstVertexNumber].emplace_back(secondVertexNumber, edgeData);
        }
@@ -66,7 +58,7 @@ public:
 
     void deleteEdge(int firstVertexNumber, int secondVertexNumber) override
     {
-        if (m_vertices.find(firstVertexNumber) != m_vertices.end() && m_vertices.find(secondVertexNumber) != m_vertices.end())
+        if (this->m_vertices.find(firstVertexNumber) != this->m_vertices.end() && this->m_vertices.find(secondVertexNumber) != this->m_vertices.end())
         {
             auto& edges = m_adjacencyList[firstVertexNumber];
             auto it = edges.begin();
@@ -81,14 +73,14 @@ public:
 
     bool isConnected()
     {
-        typename std::map<int, VertexT>::iterator it = m_vertices.begin();
+        typename std::map<int, VertexT>::iterator it = this->m_vertices.begin();
 
-        if (it != m_vertices.end())
+        if (it != this->m_vertices.end())
         {
             std::vector<int> visited;
             DepthFirstSearch(it->first, visited);
 
-            if (visited.size() != m_vertices.size())
+            if (visited.size() != this->m_vertices.size())
             {
                 return false;
             }
@@ -106,12 +98,12 @@ public:
 
     bool isStronglyConnected() override
     {
-        for (auto& vertex : m_vertices)
+        for (auto& vertex : this->m_vertices)
         {
             std::vector<int> visited;
             DepthFirstSearch(vertex.first, visited);
 
-            if (visited.size() != m_vertices.size())
+            if (visited.size() != this->m_vertices.size())
             {
                 return false;
             }
@@ -160,7 +152,7 @@ public:
 
     void printGraph()
     {
-        for (auto& vertex: m_vertices)
+        for (auto& vertex: this->m_vertices)
         {
             std::cout << vertex.first << ": ";
             for (auto& adjacent : m_adjacencyList[vertex.first])
@@ -188,7 +180,7 @@ public:
     AdjacencyListGraph<VertexT, EdgeT>* getTransposed()
     {
         AdjacencyListGraph* transposed = new AdjacencyListGraph{};
-        for (auto& vertex : m_vertices)
+        for (auto& vertex : this->m_vertices)
         {   
             int vertexNumber = vertex.first;
             VertexT vertexData = vertex.second;
@@ -213,7 +205,7 @@ public:
 
     std::map<int, VertexT>& getVertices()
     { 
-        return m_vertices; 
+        return this->m_vertices; 
     }
     
     std::map<int, std::list<std::pair<int, EdgeT>>> getAdjacencyList()
@@ -222,7 +214,6 @@ public:
     }
 
 private:
-    std::map<int, VertexT> m_vertices;
     std::map<int, std::list<std::pair<int, EdgeT>>> m_adjacencyList;
 };
 
