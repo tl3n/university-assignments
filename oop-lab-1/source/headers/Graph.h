@@ -18,6 +18,10 @@ public:
     }
     explicit Graph(std::initializer_list<std::pair<int, VertexT>> vertices)
     {
+        for (const auto& vertex : vertices)
+        {
+            m_vertices[vertex.first] = vertex.second;
+        }
     }
 
     virtual ~Graph() = default;
@@ -45,6 +49,9 @@ public:
 
     // DFS обхід графа
     virtual void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) = 0;
+
+protected:
+    std::map<int, VertexT> m_vertices;
 };   
 
 #endif
