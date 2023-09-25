@@ -43,8 +43,7 @@ TEST_CASE("testing addEdge()")
 
     graph.addEdge(2, 3, 96);
     
-    std::map<int, std::vector<std::pair<int, int>>> adjacencyList = graph.getAdjacencyList();
-    
+    std::map<int, std::list<std::pair<int, int>>> adjacencyList = graph.getAdjacencyList();
     auto it = adjacencyList[2].begin();
     REQUIRE(it->first == 3);
     REQUIRE(it->second == 96);
@@ -60,12 +59,10 @@ TEST_CASE("testing deleteEdge()")
 
     graph.addEdge(2, 3, 96);
 
-    std::map<int, std::vector<std::pair<int, int>>> adjacencyList = graph.getAdjacencyList();
-    
+    std::map<int, std::list<std::pair<int, int>>> adjacencyList = graph.getAdjacencyList();
     graph.deleteEdge(2, 3);
     
-    std::map<int, std::vector<std::pair<int, int>>> test = graph.getAdjacencyList();
-    
+    std::map<int, std::list<std::pair<int, int>>> test = graph.getAdjacencyList();
     REQUIRE(adjacencyList[2].size() != test[2].size());
 }
 

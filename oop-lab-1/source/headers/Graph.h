@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <map>
 #include <queue>
+#include <list>
 #include <algorithm>
 
 template <typename VertexT, typename EdgeT>

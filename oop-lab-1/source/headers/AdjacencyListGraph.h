@@ -69,7 +69,9 @@ public:
         if (m_vertices.find(firstVertexNumber) != m_vertices.end() && m_vertices.find(secondVertexNumber) != m_vertices.end())
         {
             auto& edges = m_adjacencyList[firstVertexNumber];
-            edges.erase(edges.begin() + secondVertexNumber - 1);
+            auto it = edges.begin();
+            std::advance(it, secondVertexNumber - 1);
+            edges.erase(it);
         }
         else
         {
@@ -213,14 +215,15 @@ public:
     { 
         return m_vertices; 
     }
-    std::map<int, std::vector<std::pair<int, EdgeT>>>& getAdjacencyList()
-    { 
+    
+    std::map<int, std::list<std::pair<int, EdgeT>>> getAdjacencyList()
+    {
         return m_adjacencyList;
     }
 
 private:
     std::map<int, VertexT> m_vertices;
-    std::map<int, std::vector<std::pair<int, EdgeT>>> m_adjacencyList;
+    std::map<int, std::list<std::pair<int, EdgeT>>> m_adjacencyList;
 };
 
 #endif
