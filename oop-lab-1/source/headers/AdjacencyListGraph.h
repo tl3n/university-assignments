@@ -71,46 +71,53 @@ public:
         }
     }   
 
-    bool isConnected()
+    void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) override
     {
-        typename std::map<int, VertexT>::iterator it = this->m_vertices.begin();
+        visited.emplace_back(vertexNumber);
 
-        if (it != this->m_vertices.end())
+        for (auto& edges: m_adjacencyList[vertexNumber])
         {
-            std::vector<int> visited;
-            DepthFirstSearch(it->first, visited);
-
-            if (visited.size() != this->m_vertices.size())
+            int adjacent = edges.first;
+            if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
             {
-                return false;
+                DepthFirstSearch(adjacent, visited);
             }
         }
+    }
 
-        return true;
+    AdjacencyListGraph<VertexT, EdgeT>* getTransposed()
+    {
+        AdjacencyListGraph* transposed = new AdjacencyListGraph{};
+        for (auto& vertex : this->m_vertices)
+        {   
+            int vertexNumber = vertex.first;
+            VertexT vertexData = vertex.second;
+
+            transposed->addVertex(vertexNumber, vertexData);
+        }
+
+        for (auto& edges: m_adjacencyList)
+        {
+            int adjacent = edges.first;
+            for (auto& edge : edges.second)
+            {
+                int vertexNumber = edge.first;
+                EdgeT edgeData = edge.second;
+                
+                transposed->addEdge(vertexNumber, adjacent, edgeData);
+            }
+        }
+    
+        return transposed;
     }
 
     bool isWeaklyConnected() override
     {
         AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
         
-        return isConnected() || transposed->isConnected();
+        return this->isConnected() || transposed->isConnected();
     }
 
-    bool isStronglyConnected() override
-    {
-        for (auto& vertex : this->m_vertices)
-        {
-            std::vector<int> visited;
-            DepthFirstSearch(vertex.first, visited);
-
-            if (visited.size() != this->m_vertices.size())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     int findDistance(int firstVertexNumber, int secondVertexNumber) override
     {
@@ -161,46 +168,6 @@ public:
             }
             std::cout << '\n';
         }
-    }
-
-    void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) override
-    {
-        visited.emplace_back(vertexNumber);
-
-        for (auto& edge: m_adjacencyList[vertexNumber])
-        {
-            int adjacent = edge.first;
-            if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
-            {
-                DepthFirstSearch(adjacent, visited);
-            }
-        }
-    }
-
-    AdjacencyListGraph<VertexT, EdgeT>* getTransposed()
-    {
-        AdjacencyListGraph* transposed = new AdjacencyListGraph{};
-        for (auto& vertex : this->m_vertices)
-        {   
-            int vertexNumber = vertex.first;
-            VertexT vertexData = vertex.second;
-
-            transposed->addVertex(vertexNumber, vertexData);
-        }
-
-        for (auto& edges: m_adjacencyList)
-        {
-            int adjacent = edges.first;
-            for (auto& edge : edges.second)
-            {
-                int vertexNumber = edge.first;
-                EdgeT edgeData = edge.second;
-                
-                transposed->addEdge(vertexNumber, adjacent, edgeData);
-            }
-        }
-    
-        return transposed;
     }
     
     std::map<int, std::list<std::pair<int, EdgeT>>> getAdjacencyList()

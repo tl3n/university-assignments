@@ -38,19 +38,54 @@ public:
     // Вилучення ребра
     virtual void deleteEdge(int firstVertexNumber, int secondVertexNumber) = 0;
 
+     // DFS обхід графа
+    virtual void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) = 0;
+
+    // Перевірка на зв'язність з першої вершини
+    virtual bool isConnected()
+    {
+        typename std::map<int, VertexT>::iterator it = this->m_vertices.begin();
+
+        if (it != this->m_vertices.end())
+        {
+            std::vector<int> visited;
+            DepthFirstSearch(it->first, visited);
+
+            if (visited.size() != this->m_vertices.size())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // Перевірка на слабку зв'язність
     virtual bool isWeaklyConnected() = 0;
 
     // Перевірка на сильну зв'язність
-    virtual bool isStronglyConnected() = 0;
+    virtual bool isStronglyConnected()
+    {
+        for (auto& vertex : this->m_vertices)
+        {
+            std::vector<int> visited;
+            DepthFirstSearch(vertex.first, visited);
+
+            if (visited.size() != this->m_vertices.size())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
 
-    // DFS обхід графа
-    virtual void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) = 0;
+   
 
-    virtual std::map<int, VertexT>& getVertices()
+    virtual std::map<int, VertexT> getVertices()
     { 
         return this->m_vertices; 
     }
