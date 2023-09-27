@@ -82,9 +82,7 @@ public:
 
     // Знаходження відстані між двома вершинами
     virtual int findDistance(int firstVertexNumber, int secondVertexNumber) = 0;
-
-   
-
+    
     virtual std::map<int, VertexT> getVertices()
     { 
         return this->m_vertices; 
