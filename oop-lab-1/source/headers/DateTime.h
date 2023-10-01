@@ -1,9 +1,12 @@
+#ifndef LAB1_DATETIME_H
+#define LAB1_DATETIME_H
+
 #include <iostream>
 #include <map>
 class DateTime
 {
 public:
-    DateTime() : m_year{1}, m_month{1}, m_day{1}, m_hour{0}, m_minute{0}, m_second{0} {}
+    DateTime(): m_year{1}, m_month{1}, m_day{1}, m_hour{0}, m_minute{0}, m_second{0} {}
 
     DateTime(int year, int month, int day, int hour, int minute, int second)
     {
@@ -12,12 +15,12 @@ public:
         setDay(day);
         setHour(hour);
         setMinute(minute);
-        setSecond(secon);
+        setSecond(second);
     }
 
     bool yearIsLeap()
     {
-        return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+        return ((m_year % 4 == 0 && m_year % 100 != 0) || m_year % 400 == 0);
     }
 
 // АРИФМЕТИКА ЧАСУ
@@ -55,7 +58,7 @@ public:
         }
         else
         {
-            std::cout << "INVALID DAYS INPUT\n"
+            std::cout << "INVALID DAYS INPUT\n";
         }
     }
 
@@ -87,7 +90,7 @@ public:
 
     void increaseBySeconds(int seconds)
     {
-        if (second > 0)
+        if (seconds > 0)
         {
             m_second += seconds;
             validateSecond();
@@ -142,7 +145,7 @@ public:
         }
         else
         {
-            std::cout << "INVALID DAYS INPUT\n"
+            std::cout << "INVALID DAYS INPUT\n";
         }
     }
 
@@ -174,7 +177,7 @@ public:
 
     void decreaseBySeconds(int seconds)
     {
-        if (second > 0)
+        if (seconds > 0)
         {
             m_second -= seconds;
             validateSecond();
@@ -193,32 +196,6 @@ public:
         decreaseByHours(hours);
         decreaseByMinutes(minutes);
         decreaseBySeconds(seconds);
-    }
-
-    DateTime& operator=(const DateTime& other) const
-    {
-        if (this != other)
-        {
-            this->m_year = other.getYear();
-            this->m_month = other.getMonth();
-            this->m_day = other.getDay();
-            this->m_hour = other.getHour();
-            this->m_minute = other.getMinute();
-            this->m_second = other.getSecond();
-        }
-        return *this
-    }
-
-    DateTime& operator+(const DateTime& other) const
-    {
-        increaseBy(other.getYear(), other.getMonth(), other.getDay(), other.getHour(), other.getMinute(), other.getSecond());
-        return *this;
-    }
-
-    DateTime& operator-(const DateTime& other) const
-    {
-        decreaseBy(other.getYear(), other.getMonth(), other.getDay(), other.getHour(), other.getMinute(), other.getSecond());
-        return *this;
     }
 
     // ЗНАХОДЖЕННЯ РІЗНИЦІ В ЧАСІ
@@ -269,7 +246,7 @@ public:
 
     void setMonth(int month)
     {
-        if (month >= 1 && month <= 13)
+        if (month >= 1 && month <= 12)
         {
             m_month = month;
         }
@@ -281,7 +258,13 @@ public:
 
     void setDay(int day)
     {
-        if (day > 0 && day <= DAYS_IN_MONTHS[m_month])
+        int daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
+        if (yearIsLeap())
+        {
+            daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
+        }
+        
+        if (day > 0 && day <= daysInMonth)
         {
             m_day = day;
         }
@@ -291,7 +274,7 @@ public:
         }
     }
 
-    void setHour (int hour)
+    void setHour(int hour)
     {
         if (hour >= 0 && hour < 24)
         {
@@ -359,8 +342,8 @@ public:
     }
 
 private:
-    const std::map<int, int> DAYS_IN_MONTHS_NONLEAP = {{1, 31}, {2, 28}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
-    const std::map<int, int> DAYS_IN_MONTHS_LEAP = {{1, 31}, {2, 29}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
+    std::map<int, int> DAYS_IN_MONTHS_NONLEAP = {{1, 31}, {2, 28}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
+    std::map<int, int> DAYS_IN_MONTHS_LEAP = {{1, 31}, {2, 29}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
 
     int m_year{};
     int m_month{};
@@ -415,20 +398,27 @@ private:
 
     void validateDay()
     {
-        if (yearIsLeap())
+        int daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
+        bool isLeap = yearIsLeap();
+        if (isLeap)
         {
-            std::map<int, int> daysInMonths = DAYS_IN_MONTHS_LEAP;
-        }
-        else
-        {
-            std::map<int, int> daysInMonths = DAYS_IN_MONTHS_NONLEAP;
+            daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
         }
 
-        while (m_day > daysInMonths[m_month])
+        while (m_day > daysInMonth)
         {
-            m_day -= daysInMonths[m_month];
+            m_day -= daysInMonth;
             ++m_month;
             validateMonth();
+
+            if (isLeap)
+            {
+                daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
+            }
+            else
+            {
+                daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
+            }
         }
 
         if (m_day < 1)
@@ -459,4 +449,6 @@ private:
             m_year = 1;
         }
     }
-}
+};
+
+#endif
