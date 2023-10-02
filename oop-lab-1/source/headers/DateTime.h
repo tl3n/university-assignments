@@ -2,104 +2,100 @@
 #define LAB1_DATETIME_H
 
 #include <iostream>
-#include <map>
 #include <cstdlib>
+#include <ctime>
 
 class DateTime
 {
 public:
-    DateTime(): m_year{1}, m_month{1}, m_day{1}, m_hour{0}, m_minute{0}, m_second{0} {}
-
     DateTime(int year, int month, int day, int hour, int minute, int second)
     {
-        setYear(year);
-        setMonth(month);
-        setDay(day);
-        setHour(hour);
-        setMinute(minute);
-        setSecond(second);
-    }
+        std::tm timeData{};
+        timeData.tm_year = year - 1900;
+        timeData.tm_mon = month - 1;
+        timeData.tm_mday = day;
+        timeData.tm_hour = hour - 1;
+        timeData.tm_min = minute;
+        timeData.tm_sec = second;
 
-    bool yearIsLeap()
-    {
-        return ((m_year % 4 == 0 && m_year % 100 != 0) || m_year % 400 == 0);
-    }
-
-// АРИФМЕТИКА ЧАСУ
-    void increaseByYears(int years)
-    {
-        if (years > 0)
+        if (std::mktime(&timeData) == -1)
         {
-            m_year += years;
+            std::cout << "INVALID DATE AND TIME\n";
         }
         else
         {
-            std::cout << "INVALID YEARS INPUT\n";
+            m_time = mktime(&timeData);
         }
     }
 
-    void increaseByMonths(int months)
+    bool isValid(std::tm timeData)
     {
-        if (months > 0)
-        {
-            m_month += months;
-            validateMonth();
-        }
-        else
-        {
-            std::cout << "INVALID MONTHS INPUT\n";
-        }
-    }
-
-    void increaseByDays(int days)
-    {
-        if (days > 0)
-        {
-            m_day += days;
-            validateDay();
-        }
-        else
-        {
-            std::cout << "INVALID DAYS INPUT\n";
-        }
-    }
-
-    void increaseByHours(int hours)
-    {
-        if (hours > 0)
-        {
-            m_hour += hours;
-            validateHour();
-        }
-        else
-        {
-            std::cout <<"INVALID HOURS INPUT\n";
-        }
-    }
-
-    void increaseByMinutes(int minutes)
-    {
-        if (minutes > 0)
-        {
-            m_minute += minutes;
-            validateMinute();
-        }
-        else
-        {
-            std::cout << "INVALID MINUTES INPUT\n";
-        }
+        return (timeData.tm_year >= 0 && timeData.tm_mon < 12 && timeData.tm_mday > 0 && timeData.tm_mday <= getDaysInMonth(timeData.tm_year + 1900, timeData.tm_mon + 1) && timeData.tm_hour >= 0 && timeData.tm_hour < 24 && timeData.tm_min >= 0 && timeData.tm_min < 60 && timeData.tm_sec >= 0 && timeData.tm_sec < 60);
     }
 
     void increaseBySeconds(int seconds)
     {
-        if (seconds > 0)
+        m_time += seconds;
+    }
+
+    void increaseByMinutes(int minutes)
+    {
+        m_time += minutes * 60;
+    }
+
+    void increaseByHours(int hours)
+    {
+        m_time += hours * 3600;
+    }
+
+    void increaseByDays(int days)
+    {
+        m_time += days * 86400;
+    }
+
+    void increaseByMonths(int months)
+    {
+        std::tm timeData = *std::localtime(&m_time);
+
+        int month = timeData.tm_mon + 1 + months;
+        int year = timeData.tm_year + 1900;
+
+        while (month > 12)
         {
-            m_second += seconds;
-            validateSecond();
+            month -= 12;
+            ++year;
         }
-        else
+
+        while (month < 1)
         {
-            std::cout << "INVALID SECONDS INPUT\n";
+            month += 12;
+            --year;
+        }
+
+        timeData.tm_mon = month - 1;
+        timeData.tm_year = year - 1900;
+
+        if (isValid(timeData))
+        {
+            m_time = mktime(&timeData);
+        }
+
+    }
+
+    void increaseByYears(int years)
+    {
+        std::tm timeData = *std::localtime(&m_time);
+        
+        int year = timeData.tm_year + years + 1900;
+        if (year < 1900)
+        {
+            year = 1900;
+        }
+
+        timeData.tm_year = year - 1900;
+        if (isValid(timeData))
+        {
+            m_time = mktime(&timeData);
         }
     }
 
@@ -113,349 +109,139 @@ public:
         increaseByYears(years);
     }
 
-    void decreaseByYears(int years)
+    void decreaseBySeconds(int seconds)
     {
-        if (years > 0)
-        {
-            m_year -= years;
-            validateYear();
-        }
-        else
-        {
-            std::cout << "INVALID YEARS INPUT\n";
-        }
-    }
-
-    void decreaseByMonths(int months)
-    {
-        if (months > 0)
-        {
-            m_month -= months;
-            validateMonth();
-        }
-        else
-        {
-            std::cout << "INVALID MONTHS INPUT\n";
-        }
-    }
-
-    void decreaseByDays(int days)
-    {
-        if (days > 0)
-        {
-            m_day -= days;
-            validateDay();
-        }
-        else
-        {
-            std::cout << "INVALID DAYS INPUT\n";
-        }
-    }
-
-    void decreaseByHours(int hours)
-    {
-        if (hours > 0)
-        {
-            m_hour -= hours;
-            validateHour();
-        }
-        else
-        {
-            std::cout <<"INVALID HOURS INPUT\n";
-        }
+        increaseBySeconds(-seconds);
     }
 
     void decreaseByMinutes(int minutes)
     {
-        if (minutes > 0)
-        {
-            m_minute -= minutes;
-            validateMinute();
-        }
-        else
-        {
-            std::cout << "INVALID MINUTES INPUT\n";
-        }
+        increaseByMinutes(-minutes);
     }
 
-    void decreaseBySeconds(int seconds)
+    void decreaseByHours(int hours)
     {
-        if (seconds > 0)
-        {
-            m_second -= seconds;
-            validateSecond();
-        }
-        else
-        {
-            std::cout << "INVALID SECONDS INPUT\n";
-        }
+        increaseByHours(-hours);
+    }
+
+    void decreaseByDays(int days)
+    {
+        increaseByDays(-days);
+    }
+
+    void decreaseByMonths(int months)
+    {
+        increaseByMonths(-months);
+    }
+
+    void decreaseByYears(int years)
+    {
+        increaseByYears(-years);
     }
 
     void decreaseBy(int years, int months, int days, int hours, int minutes, int seconds)
     {
-        decreaseBySeconds(seconds);
-        decreaseByMinutes(minutes);
-        decreaseByHours(hours);
-        decreaseByDays(days);
-        decreaseByMonths(months);
-        decreaseByYears(years);
-
-    }
-    
-    // СЕТТЕРИ
-
-    void setYear(int year)
-    {
-        if (year > 0)
-        {
-            m_year = year;
-        }
-        else
-        {
-            std::cout << "INVALID YEAR INPUT\n";
-        }
+        increaseBy(-years, -months, -days, -hours, -minutes, -seconds);
     }
 
-    void setMonth(int month)
+    long long int secondsDifference(DateTime& other)
     {
-        if (month >= 1 && month <= 12)
-        {
-            m_month = month;
-        }
-        else
-        {
-            std::cout << "INVALID MONTH INPUT\n";
-        }
+        return abs(m_time - other.getTime());
     }
 
-    void setDay(int day)
+    long long int minutesDifference(DateTime& other)
     {
-        int daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
-        if (yearIsLeap())
-        {
-            daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
-        }
-        
-        if (day > 0 && day <= daysInMonth)
-        {
-            m_day = day;
-        }
-        else
-        {
-            std::cout << "INVALID DAY INPUT\n";
-        }
+        return abs(secondsDifference(other) / 60);
     }
 
-    void setHour(int hour)
+    long long int hoursDifference(DateTime& other)
     {
-        if (hour >= 0 && hour < 24)
+        return abs(secondsDifference(other) / 3600);
+    }
+
+    long int daysDifference(DateTime& other)
+    {
+        return abs(secondsDifference(other) / 86400);
+    }
+
+    int monthsDifference(DateTime& other)
+    {
+        std::tm thisTime = *std::localtime(&m_time);
+
+        std::time_t otime = other.getTime();
+        std::tm otherTime = *std::localtime(&otime);
+
+        int thisMonth = thisTime.tm_mon + 1;
+        int otherMonth = otherTime.tm_mon + 1;
+
+        int thisYear = thisTime.tm_year + 1900;
+        int otherYear = otherTime.tm_year + 1900;
+
+        int months = (thisYear - otherYear) * 12;
+        months -= thisMonth - otherMonth;
+
+        if (thisTime.tm_mday < otherTime.tm_mday)
         {
-            m_hour = hour;
+            return months - 1;
         }
-        else
+        else if (thisTime.tm_mday == otherTime.tm_mday)
         {
-            std::cout << "INVALID HOUR INPUT\n";
+            int time = thisTime.tm_hour * 3600 + thisTime.tm_min * 60 + thisTime.tm_sec;
+            int otime = otherTime.tm_hour * 3600 + otherTime.tm_min * 60 + otherTime.tm_sec;
+
+            if (time < otime)
+            {
+                return months - 1;
+            }
         }
+
+        return months;
     }
 
-    void setMinute(int minute)
+    int yearsDifference(DateTime& other)
     {
-        if (minute >= 0 && minute < 60)
-        {
-            m_minute = minute;
-        }
-        else
-        {
-            std::cout << "INVALID MINUTE INPUT\n";
-        }
+        return monthsDifference(other) / 12;
     }
 
-    void setSecond(int second)
+
+    int getDayOfWeek()
     {
-        if (second >= 0 && second < 60)
-        {
-            m_second = second;
-        }
-        else
-        {
-            std::cout << "INVALID SECOND INPUT\n";
-        }
+        std::tm time = getTimeStructure();
+        return time.tm_wday;
     }
 
-    // ГЕТТЕРИ
-    int getYear()
+    std::time_t getTime()
     {
-        return m_year;
+        return m_time;
     }
 
-    int getMonth()
+    std::string getTimeFormatted()
     {
-        return m_month;
+        return std::ctime(&m_time);
     }
 
-    int getDay()
+    std::tm getTimeStructure()
     {
-        return m_day;
-    }
-
-    int getHour()
-    {
-        return m_hour;
-    }
-
-    int getMinute()
-    {
-        return m_minute;
-    }
-
-    int getSecond()
-    {
-        return m_second;
+        return *std::localtime(&m_time); 
     }
 
 private:
-    std::map<int, int> DAYS_IN_MONTHS_NONLEAP = {{1, 31}, {2, 28}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
-    std::map<int, int> DAYS_IN_MONTHS_LEAP = {{1, 31}, {2, 29}, {3, 31},{4, 30}, {5, 31}, {6, 30}, {7, 31}, {8, 31}, {9, 30}, {10, 31}, {11, 30}, {12, 31}};
+    std::time_t m_time;
+    inline static const int DAYS_IN_MONTHS_NONLEAP[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    int m_year{};
-    int m_month{};
-    int m_day{};
-    int m_hour{};
-    int m_minute{};
-    int m_second{};
-
-    void validateSecond()
-    {
-        if (m_second >= 60)
+    int getDaysInMonth(int year, int month)
+    {   
+        if (yearIsLeap(year) && month == 2)
         {
-            int minutes = m_second / 60;
-            m_minute += minutes;
-
-            m_second %= 60;
-        }
-        else if (m_second < 0)
-        {
-            int minutes = (-m_second - 1) / 60 + 1;
-            m_minute -= minutes;
-
-            int seconds = -m_second % 60;
-            m_second = 60 - seconds;
+            return 29;
         }
 
-        validateMinute();
-    }
-    
-    void validateMinute()
-    {
-        if (m_minute >= 60)
-        {
-            int hours = m_minute / 60;
-            m_hour += hours;
-
-            m_minute %= 60;
-        }
-        else if (m_minute < 0)
-        {
-            int hours = (-m_minute - 1) / 60 + 1;
-            m_hour -= hours;
-
-            int minutes = -m_minute % 60;
-            m_minute = 60 - minutes;
-        }
-
-        validateHour();
+        return DAYS_IN_MONTHS_NONLEAP[month - 1];
     }
 
-    void validateHour()
+    bool yearIsLeap(int year)
     {
-        if (m_hour >= 24)
-        {
-            int days = m_hour / 24;
-            m_day += days;
-
-            m_hour %= 24;
-        }
-        else if (m_hour < 0)
-        {
-            int days = (-m_hour - 1) / 24 + 1;
-            m_day -= days;
-
-            int hours = -m_hour % 24;
-            m_hour = 24 - hours;
-        }
-
-        validateDay();
-    }
-
-    void validateDay()
-    {
-        int daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
-        bool isLeap = yearIsLeap();
-        if (isLeap)
-        {
-            daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
-        }
-
-        while (m_day > daysInMonth)
-        {
-            m_day -= daysInMonth;
-            ++m_month;
-            validateMonth();
-
-            if (isLeap)
-            {
-                daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
-            }
-            else
-            {
-                daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
-            }
-        }
-
-        while (m_day < 1)
-        {
-            m_day += daysInMonth;
-            --m_month;
-            validateMonth();
-
-            if (isLeap)
-            {
-                daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
-            }
-            else
-            {
-                daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
-            }
-        }
-    }
-
-    void validateMonth()
-    {
-        if (m_month > 12)
-        {
-            int years = m_month / 12;
-            m_year += years;
-
-            m_month %= 12;
-        }
-        else if (m_month < 1)
-        {
-            int years = -m_month / 12 + 1;
-            m_year -= years;
-
-            int months = -m_month % 12;
-            m_month = 12 - months;
-        }
-
-        validateYear();
-    }
-
-    void validateYear()
-    {
-        if (m_year < 1)
-        {
-            m_year = 1;
-        }
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
 };
 
