@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <map>
+#include <cstdlib>
+
 class DateTime
 {
 public:
@@ -103,12 +105,12 @@ public:
 
     void increaseBy(int years, int months, int days, int hours, int minutes, int seconds)
     {
-        increaseByYears(years);
-        increaseByMonths(months);
-        increaseByDays(days);
-        increaseByHours(hours);
-        increaseByMinutes(minutes);
         increaseBySeconds(seconds);
+        increaseByMinutes(minutes);
+        increaseByHours(hours);
+        increaseByDays(days);
+        increaseByMonths(months);
+        increaseByYears(years);
     }
 
     void decreaseByYears(int years)
@@ -116,6 +118,7 @@ public:
         if (years > 0)
         {
             m_year -= years;
+            validateYear();
         }
         else
         {
@@ -190,46 +193,15 @@ public:
 
     void decreaseBy(int years, int months, int days, int hours, int minutes, int seconds)
     {
-        decreaseByYears(years);
-        decreaseByMonths(months);
-        decreaseByDays(days);
-        decreaseByHours(hours);
-        decreaseByMinutes(minutes);
         decreaseBySeconds(seconds);
-    }
+        decreaseByMinutes(minutes);
+        decreaseByHours(hours);
+        decreaseByDays(days);
+        decreaseByMonths(months);
+        decreaseByYears(years);
 
-    // ЗНАХОДЖЕННЯ РІЗНИЦІ В ЧАСІ
-
-    int yearsDifference(DateTime& other)
-    {
-        return m_year - other.getYear();
-    }
-
-    int monthsDifference(DateTime& other)
-    {
-        return m_month - other.getMonth();
     }
     
-    int daysDifference(DateTime& other)
-    {
-        return m_day - other.getDay();
-    }
-    
-    int hoursDifference(DateTime& other)
-    {
-        return m_hour - other.getHour();
-    }
-
-    int minutesDifference(DateTime& other)
-    {
-        return m_minute - other.getMinute();
-    }
-
-    int secondsDifference(DateTime& other)
-    {
-        return m_second - other.getSecond();
-    }
-
     // СЕТТЕРИ
 
     void setYear(int year)
@@ -363,10 +335,16 @@ private:
         }
         else if (m_second < 0)
         {
-            m_second = 0;
+            int minutes = (-m_second - 1) / 60 + 1;
+            m_minute -= minutes;
+
+            int seconds = -m_second % 60;
+            m_second = 60 - seconds;
         }
-        
+
+        validateMinute();
     }
+    
     void validateMinute()
     {
         if (m_minute >= 60)
@@ -378,9 +356,16 @@ private:
         }
         else if (m_minute < 0)
         {
-            m_minute = 0;
+            int hours = (-m_minute - 1) / 60 + 1;
+            m_hour -= hours;
+
+            int minutes = -m_minute % 60;
+            m_minute = 60 - minutes;
         }
+
+        validateHour();
     }
+
     void validateHour()
     {
         if (m_hour >= 24)
@@ -392,8 +377,14 @@ private:
         }
         else if (m_hour < 0)
         {
-            m_hour = 0;
+            int days = (-m_hour - 1) / 24 + 1;
+            m_day -= days;
+
+            int hours = -m_hour % 24;
+            m_hour = 24 - hours;
         }
+
+        validateDay();
     }
 
     void validateDay()
@@ -421,9 +412,20 @@ private:
             }
         }
 
-        if (m_day < 1)
+        while (m_day < 1)
         {
-            m_day = 1;
+            m_day += daysInMonth;
+            --m_month;
+            validateMonth();
+
+            if (isLeap)
+            {
+                daysInMonth = DAYS_IN_MONTHS_LEAP[m_month];
+            }
+            else
+            {
+                daysInMonth = DAYS_IN_MONTHS_NONLEAP[m_month];
+            }
         }
     }
 
@@ -438,8 +440,14 @@ private:
         }
         else if (m_month < 1)
         {
-            m_month = 1;
+            int years = -m_month / 12 + 1;
+            m_year -= years;
+
+            int months = -m_month % 12;
+            m_month = 12 - months;
         }
+
+        validateYear();
     }
 
     void validateYear()
