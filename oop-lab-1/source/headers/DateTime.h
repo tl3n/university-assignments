@@ -8,6 +8,7 @@
 class DateTime
 {
 public:
+    
     DateTime(int year, int month, int day, int hour, int minute, int second)
     {
         std::tm timeData{};
@@ -165,37 +166,34 @@ public:
     }
 
     int monthsDifference(DateTime& other)
-    {
-        std::tm thisTime = *std::localtime(&m_time);
+    {   
+        std::tm fromDate = other.getTimeStructure();
+        std::tm toDate = getTimeStructure();
 
-        std::time_t otime = other.getTime();
-        std::tm otherTime = *std::localtime(&otime);
-
-        int thisMonth = thisTime.tm_mon + 1;
-        int otherMonth = otherTime.tm_mon + 1;
-
-        int thisYear = thisTime.tm_year + 1900;
-        int otherYear = otherTime.tm_year + 1900;
-
-        int months = (thisYear - otherYear) * 12;
-        months -= thisMonth - otherMonth;
-
-        if (thisTime.tm_mday < otherTime.tm_mday)
+        if (other.getTime() > getTime())
         {
-            return months - 1;
+            fromDate = getTimeStructure();
+            toDate = other.getTimeStructure();
         }
-        else if (thisTime.tm_mday == otherTime.tm_mday)
+        
+        int difference = (toDate.tm_year - fromDate.tm_year) * 12 + (toDate.tm_mon - fromDate.tm_mon);
+        
+        if (toDate.tm_mday < fromDate.tm_mday)
         {
-            int time = thisTime.tm_hour * 3600 + thisTime.tm_min * 60 + thisTime.tm_sec;
-            int otime = otherTime.tm_hour * 3600 + otherTime.tm_min * 60 + otherTime.tm_sec;
+            difference -= 1;
+        }
+        else if (toDate.tm_mday == fromDate.tm_mday)
+        {
+            int toTime = toDate.tm_hour * 3600 + toDate.tm_min * 60 + toDate.tm_sec;
+            int fromTime = fromDate.tm_hour * 3600 + fromDate.tm_min * 60 + fromDate.tm_sec;
 
-            if (time < otime)
+            if (toTime < fromTime)
             {
-                return months - 1;
+                difference -= 1;
             }
         }
 
-        return months;
+        return difference;
     }
 
     int yearsDifference(DateTime& other)

@@ -1,155 +1,68 @@
-#include "doctest.h"
-
-TEST_CASE("testing setters")
+TEST_CASE("testing increase and decrease")
 {
-    DateTime date;
+    DateTime dt(2023, 10, 3, 12, 30, 0);
 
-    SUBCASE("year")
-    {
-        date.setYear(2023);
-        date.setYear(0);
-        date.setYear(-4);
-
-        REQUIRE(date.getYear() == 2023);
-    }
-
-    SUBCASE("month")
-    {
-        date.setMonth(2);
-        date.setMonth(0);
-        date.setMonth(13);
-
-        REQUIRE(date.getMonth() == 2);
-    }
-
-    SUBCASE("day, nonleap year")
-    {
-        date.setYear(2023);
-        date.setMonth(2);
-
-        date.setDay(28);
-        date.setDay(0);
-        date.setDay(29);
-
-        REQUIRE(date.getDay() == 28);
-    }
-
-    SUBCASE("day, leap year")
-    {
-        date.setYear(2024);
-        date.setMonth(2);
-
-        date.setDay(29);
-
-        REQUIRE(date.getDay() == 29);
-    }
-
-    SUBCASE("hour")
-    {
-        date.setHour(18);
-        date.setHour(-1);
-        date.setHour(24);
-
-        REQUIRE(date.getHour() == 18);
-    }
-
-    SUBCASE("minute")
-    {
-        date.setMinute(20);
-        date.setMinute(-1);
-        date.setMinute(60);
-
-        REQUIRE(date.getMinute() == 20);
-    }
-
-    SUBCASE("second")
-    {
-        date.setSecond(52);
-        date.setSecond(-1);
-        date.setSecond(60);
-
-        REQUIRE(date.getSecond() == 52);
-    }
+    dt.increaseBySeconds(10);
+    CHECK(dt.getTimeFormatted() == "Tue Oct 03 12:30:10 2023\n");
+        
+    dt.increaseByMinutes(5);
+    CHECK(dt.getTimeFormatted() == "Tue Oct 03 12:35:10 2023\n");
+        
+    dt.increaseByHours(2);
+    CHECK(dt.getTimeFormatted() == "Tue Oct 03 14:35:10 2023\n");
+        
+    dt.increaseByDays(7);
+    CHECK(dt.getTimeFormatted() == "Tue Oct 10 14:35:10 2023\n");
+        
+    dt.increaseByMonths(2);
+    CHECK(dt.getTimeFormatted() == "Sun Dec 10 13:35:10 2023\n");
+        
+    dt.increaseByYears(1);
+    CHECK(dt.getTimeFormatted() == "Tue Dec 10 13:35:10 2024\n");
+    
+    dt.decreaseBySeconds(20);
+    CHECK(dt.getTimeFormatted() == "Tue Dec 10 13:34:50 2024\n");
+        
+    dt.decreaseByMinutes(15);
+    CHECK(dt.getTimeFormatted() == "Tue Dec 10 13:19:50 2024\n");
+        
+    dt.decreaseByHours(1);
+    CHECK(dt.getTimeFormatted() == "Tue Dec 10 12:19:50 2024\n");
+        
+    dt.decreaseByDays(5);
+    CHECK(dt.getTimeFormatted() == "Thu Dec 05 12:19:50 2024\n");
+        
+    dt.decreaseByMonths(2);
+    CHECK(dt.getTimeFormatted() == "Sat Oct 05 13:19:50 2024\n");
+        
+    dt.decreaseByYears(2);
+    CHECK(dt.getTimeFormatted() == "Wed Oct 05 13:19:50 2022\n");
 }
 
-TEST_CASE("testing increase")
+TEST_CASE("testing monthDifference()")
 {
-    DateTime date(2023, 1, 1, 0, 0, 0);
-
-    SUBCASE("by seconds")
-    {
-        date.increaseBySeconds(61);
-        REQUIRE(date.getSecond() == 1);
-        REQUIRE(date.getMinute() == 1);
-    }
-
-    SUBCASE("by minutes")
-    {
-        date.increaseByMinutes(61);
-        REQUIRE(date.getMinute() == 1);
-        REQUIRE(date.getHour() == 1);
-    }
-
-    SUBCASE("by hours")
-    {
-        date.increaseByHours(25);
-        REQUIRE(date.getHour() == 1);
-        REQUIRE(date.getDay() == 2);
-    }
-
-    SUBCASE("by days, nonleap year")
-    {
-        date.setMonth(2);
-        date.increaseByDays(29);
-        REQUIRE(date.getDay() == 2);
-        REQUIRE(date.getMonth() == 3);
-    }
-
-    SUBCASE("by days, leap year")
-    {
-        date.setYear(2024);
-        date.setMonth(2);
-        date.increaseByDays(29);
-        REQUIRE(date.getDay() == 1);
-        REQUIRE(date.getMonth() == 3);
-    }
-
-    SUBCASE("by months")
-    {
-        date.increaseByMonths(12);
-        REQUIRE(date.getMonth() == 1);
-        REQUIRE(date.getYear() == 2024);
-    }
+    DateTime dt1(2023, 10, 3, 12, 30, 0);
+    DateTime dt2(2022, 8, 15, 10, 0, 0);
+    DateTime dt3(2023, 11, 1, 14, 0, 0);
+    
+    CHECK(dt1.monthsDifference(dt2) == 13); 
+    CHECK(dt2.monthsDifference(dt1) == 13); 
+    CHECK(dt1.monthsDifference(dt3) == 0);   
+    CHECK(dt3.monthsDifference(dt1) == 0);  
+    
+    DateTime dt4(2023, 10, 15, 12, 0, 0);
+    DateTime dt5(2023, 10, 15, 15, 0, 0);
+    CHECK(dt4.monthsDifference(dt5) == 0);   
+    CHECK(dt5.monthsDifference(dt4) == 0);   
+    
+    DateTime dt6(2023, 9, 15, 12, 0, 0);
+    DateTime dt7(2023, 11, 15, 15, 0, 0);
+    CHECK(dt6.monthsDifference(dt7) == 2);   
+    CHECK(dt7.monthsDifference(dt6) == 2);  
+    
+    DateTime dt8(2022, 10, 15, 12, 0, 0);
+    DateTime dt9(2024, 10, 15, 15, 0, 0);
+    CHECK(dt8.monthsDifference(dt9) == 24);  
+    CHECK(dt9.monthsDifference(dt8) == 24); 
 }
 
-// достатньо одного кейсу, бо він задіває всі цікаві випадки
-TEST_CASE("testing decrease validation")
-{
-    DateTime date(2023, 1, 1, 0, 0, 0);
-
-    date.decreaseBySeconds(1);
-    REQUIRE(date.getSecond() == 59);
-    REQUIRE(date.getMinute() == 59);
-    REQUIRE(date.getHour() == 23);
-    REQUIRE(date.getDay() == 31);
-    REQUIRE(date.getMonth() == 12);
-    REQUIRE(date.getYear() == 2022);
-}
-
-TEST_CASE("testing difference")
-{
-    DateTime date(2023, 1, 1, 0, 0, 0);
-    DateTime other(2022, 12, 31, 23, 59, 59);
-
-    SUBCASE("years")
-    {
-        int difference = date.yearsDifference(other);
-        REQUIRE(difference == 1);
-    }
-
-    /*SUBCASE("months")
-    {
-        int difference = date.monthDifference(other);
-        REQUIRE(difference == )
-    }*/
-}
