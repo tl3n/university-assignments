@@ -3,16 +3,21 @@
 
 #include "Graph.h"
 
+// Шаблон класу для використання різних типів даних
 template <typename VertexT, typename EdgeT>
 class AdjacencyListGraph : public Graph<VertexT, EdgeT>
 {
 public:
+    // Стандарнний конструктор
     explicit AdjacencyListGraph() : Graph<VertexT, EdgeT>() {}
 
+    // Конструктор із списком ініціалізації для додавання вершин
     explicit AdjacencyListGraph(std::initializer_list<std::pair<int, VertexT>> vertices) : Graph<VertexT, EdgeT>(vertices) {}
 
+    // Стандартний деструктор
     ~AdjacencyListGraph() = default;
 
+    // Додавання вершини до графу
     void addVertex(int vertexNumber, VertexT vertexData) override
     {
         if (this->m_vertices.find(vertexNumber) == this->m_vertices.end() && vertexNumber >= 0)
@@ -25,11 +30,14 @@ public:
         }
     }
 
+    // Вилучення вершини з графу
     void deleteVertex(int vertexNumber) override
     {
         if (this->m_vertices.find(vertexNumber) != this->m_vertices.end())
         {
             this->m_vertices.erase(vertexNumber);
+            
+            // Вилучення інцидентних до вершини ребер з списку суміжності
             m_adjacencyList.erase(vertexNumber);
 
             for (auto& vertex : m_adjacencyList)
@@ -44,6 +52,7 @@ public:
         }
     }
 
+    // Додавання ребра до списку суміжності
     void addEdge(int firstVertexNumber, int secondVertexNumber, EdgeT edgeData) override
     {
        if (this->m_vertices.find(firstVertexNumber) != this->m_vertices.end() && this->m_vertices.find(secondVertexNumber) != this->m_vertices.end())
@@ -56,6 +65,7 @@ public:
        }
     }
 
+    // Видалення ребра зі списку суміжності
     void deleteEdge(int firstVertexNumber, int secondVertexNumber) override
     {
         if (this->m_vertices.find(firstVertexNumber) != this->m_vertices.end() && this->m_vertices.find(secondVertexNumber) != this->m_vertices.end())
@@ -71,6 +81,7 @@ public:
         }
     }   
 
+    // Пошук у глибину для графа, відмічає відвідані вершини
     void DepthFirstSearch(int vertexNumber, std::vector<int>& visited) override
     {
         visited.emplace_back(vertexNumber);
@@ -85,9 +96,13 @@ public:
         }
     }
 
+    // Отримання транспонованого графа
+    // Транспонований граф - орієнтований граф, де змінена орієнтація ребер
     AdjacencyListGraph<VertexT, EdgeT>* getTransposed()
     {
         AdjacencyListGraph* transposed = new AdjacencyListGraph{};
+        
+        // Копіюємо вершини
         for (auto& vertex : this->m_vertices)
         {   
             int vertexNumber = vertex.first;
@@ -96,6 +111,7 @@ public:
             transposed->addVertex(vertexNumber, vertexData);
         }
 
+        // Копіюємо ребра зі зміненою орієнтацією до списку суміжності
         for (auto& edges: m_adjacencyList)
         {
             int adjacent = edges.first;
@@ -111,6 +127,8 @@ public:
         return transposed;
     }
 
+    // Перевірка на слабку зв'язність
+    // Слабка зв'язність - при заміні всіх орієнтованих ребер на неорієнтовані граф є зв'язним
     bool isWeaklyConnected() override
     {
         AdjacencyListGraph<VertexT, EdgeT>* transposed = getTransposed();
@@ -118,10 +136,10 @@ public:
         return this->isConnected() || transposed->isConnected();
     }
 
-
+    // Знаходження відстані від однієї вершини до іншої
     int findDistance(int firstVertexNumber, int secondVertexNumber) override
     {
-        // BFS
+        // Використовуємо пошук у ширину графа
         std::map<int, int> distance;
         distance[firstVertexNumber] = 0;
 
@@ -143,12 +161,14 @@ public:
                 {
                     visited.push_back(adjacent);
                     queue.push(adjacent);
-
+                    
+                    // Заносимо відстань до кожної вершини
                     distance[adjacent] = distance[currentVertex] + 1;
                 }
             }
         }
 
+        // Якшо до заданої вершини є шлях, то повертаємо відстань до неї
         if (distance.find(secondVertexNumber) != distance.end())
         {
             return distance[secondVertexNumber];
@@ -157,25 +177,14 @@ public:
         return 0;
     }
 
-    void printGraph()
-    {
-        for (auto& vertex: this->m_vertices)
-        {
-            std::cout << vertex.first << ": ";
-            for (auto& adjacent : m_adjacencyList[vertex.first])
-            {
-                std::cout << adjacent.first << ' ';
-            }
-            std::cout << '\n';
-        }
-    }
-    
+    // Геттер списку суміжності
     std::map<int, std::list<std::pair<int, EdgeT>>> getAdjacencyList()
     {
         return m_adjacencyList;
     }
 
 private:
+    // Список суміжності
     std::map<int, std::list<std::pair<int, EdgeT>>> m_adjacencyList;
 };
 
